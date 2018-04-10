@@ -1,5 +1,7 @@
 public interface Constants
 {
+    public static final int BITS_PER_BYTE = 8;
+
     public static final int BYTES_PER_KB = 1024; // kibibytes
     public static final int BYTES_PER_MB = 1024*BYTES_PER_KB; // mebibytes
     public static final int BYTES_PER_GB = 1024*BYTES_PER_MB; // gibibyte

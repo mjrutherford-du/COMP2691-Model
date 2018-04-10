@@ -2,7 +2,7 @@
  * Class representing the functionality of a generic computer.
  */
 
-public class Computer implements Constants
+public class Computer
 {
     private final double m_clockFrequency;
     private final Memory m_memory;
@@ -20,12 +20,12 @@ public class Computer implements Constants
 
     public double getClockCycleTime_ms()
     {
-	return getClockCycleTime_s() * MS_PER_SEC;
+	return getClockCycleTime_s() * Constants.MS_PER_SEC;
     }
 
     public double getClockCycleTime_ns()
     {
-	return getClockCycleTime_s() * NS_PER_SEC;
+	return getClockCycleTime_s() * Constants.NS_PER_SEC;
     }
 
     public void run(Executable e)

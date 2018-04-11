@@ -27,7 +27,7 @@ public class BitField
     /**
      * Constructor to create a bit field out of a String containing
      * '1' and '0' characters.  The MSB is assumed to be on the left
-     * size of the string (index zero), with the LSB on the right side
+     * side of the string (index zero), with the LSB on the right side
      * of the string (length - 1).
      *
      * In the parsing logic, '0' characters are 'false' and all other
@@ -108,6 +108,14 @@ public class BitField
     }
 
     /**
+     * @return the number of bits in the BitField.
+     */
+    public int length()
+    {
+	return m_bits.length;
+    }
+
+    /**
      * Sets the bit value at the specified index.
      * @param index value between (0,lenth-1)
      * @param value boolean value
@@ -118,8 +126,32 @@ public class BitField
     }
 
     /**
+     * Sets all the bits to the specified value.
+     */
+    public void setAll(boolean value)
+    {
+	for(int i=0; i<m_bits.length; i++){
+	    m_bits[i] = value;
+	}
+    }
+
+    /** Sets all the bits to true.
+     */
+    public void setAllTrue()
+    {
+	setAll(true);
+    }
+
+    /** Sets all the bits to true.
+     */
+    public void setAllFalse()
+    {
+	setAll(false);
+    }
+
+    /**
      * Sets the bit at the specified index to false.
-     * @param index value between (0,lenth-1)
+     * @param index value between (0,length-1)
      */
     public void setFalse(int index)
     {
@@ -135,11 +167,13 @@ public class BitField
 	m_bits[index] = true;
     }
 
-    /**
-     * @return the number of bits in the BitField.
-     */
-    public int size()
+    public String toString()
     {
-	return m_bits.length;
+	StringBuilder sb = new StringBuilder(m_bits.length);
+	for(boolean b : m_bits){
+	    // put the character at the beginning
+	    sb.insert(0, (b ? '1' : '0'));
+	}
+	return sb.toString();
     }
 }

@@ -22,135 +22,177 @@
 <span class="sourceLineNo">014</span>     * Constructor to create a bit-field of the specified<a name="line.14"></a>
 <span class="sourceLineNo">015</span>     * size, with all bits set to zero.<a name="line.15"></a>
 <span class="sourceLineNo">016</span>     *<a name="line.16"></a>
-<span class="sourceLineNo">017</span>     * @param size value greater than zero indicating the number of bits to represent.<a name="line.17"></a>
-<span class="sourceLineNo">018</span>     */<a name="line.18"></a>
-<span class="sourceLineNo">019</span>    public BitField(int size)<a name="line.19"></a>
-<span class="sourceLineNo">020</span>    {<a name="line.20"></a>
-<span class="sourceLineNo">021</span>        if(size &lt;= 0){<a name="line.21"></a>
-<span class="sourceLineNo">022</span>            throw new IllegalArgumentException(String.format("BitField.BitField(%d) is not allowed.", size));<a name="line.22"></a>
-<span class="sourceLineNo">023</span>        }<a name="line.23"></a>
-<span class="sourceLineNo">024</span>        m_bits = new boolean [ size ];<a name="line.24"></a>
-<span class="sourceLineNo">025</span>    }<a name="line.25"></a>
-<span class="sourceLineNo">026</span><a name="line.26"></a>
-<span class="sourceLineNo">027</span>    /**<a name="line.27"></a>
-<span class="sourceLineNo">028</span>     * Constructor to create a bit field out of a String containing<a name="line.28"></a>
-<span class="sourceLineNo">029</span>     * '1' and '0' characters.  The MSB is assumed to be on the left<a name="line.29"></a>
-<span class="sourceLineNo">030</span>     * size of the string (index zero), with the LSB on the right side<a name="line.30"></a>
-<span class="sourceLineNo">031</span>     * of the string (length - 1).<a name="line.31"></a>
-<span class="sourceLineNo">032</span>     *<a name="line.32"></a>
-<span class="sourceLineNo">033</span>     * In the parsing logic, '0' characters are 'false' and all other<a name="line.33"></a>
-<span class="sourceLineNo">034</span>     * characters are 'true'.<a name="line.34"></a>
-<span class="sourceLineNo">035</span>     *<a name="line.35"></a>
-<span class="sourceLineNo">036</span>     * @param value non-null, non-empty string to be converted to a<a name="line.36"></a>
-<span class="sourceLineNo">037</span>     * byte array.<a name="line.37"></a>
-<span class="sourceLineNo">038</span>     */<a name="line.38"></a>
-<span class="sourceLineNo">039</span>    public BitField(String value)<a name="line.39"></a>
-<span class="sourceLineNo">040</span>    {<a name="line.40"></a>
-<span class="sourceLineNo">041</span>        if(null == value){<a name="line.41"></a>
-<span class="sourceLineNo">042</span>            throw new IllegalArgumentException("BitField.BitField((String)null) is not allowed.");<a name="line.42"></a>
-<span class="sourceLineNo">043</span>        }<a name="line.43"></a>
-<span class="sourceLineNo">044</span>        if(value.length() == 0){<a name="line.44"></a>
-<span class="sourceLineNo">045</span>            throw new IllegalArgumentException("BitField.BitField(\"\") is not allowed.");<a name="line.45"></a>
-<span class="sourceLineNo">046</span>        }<a name="line.46"></a>
-<span class="sourceLineNo">047</span>        m_bits = new boolean [ value.length() ];<a name="line.47"></a>
-<span class="sourceLineNo">048</span>        // change the order<a name="line.48"></a>
-<span class="sourceLineNo">049</span>        for(int i=value.length()-1, idx = 0; i &gt;= 0; i--, idx++){<a name="line.49"></a>
-<span class="sourceLineNo">050</span>            m_bits[idx] = !(value.charAt(i) == '0');<a name="line.50"></a>
-<span class="sourceLineNo">051</span>        }<a name="line.51"></a>
-<span class="sourceLineNo">052</span>    }<a name="line.52"></a>
-<span class="sourceLineNo">053</span><a name="line.53"></a>
-<span class="sourceLineNo">054</span>    /**<a name="line.54"></a>
-<span class="sourceLineNo">055</span>     * Constructor to create a bit-field from a byte array.  In the<a name="line.55"></a>
-<span class="sourceLineNo">056</span>     * argument byte array, the LSB is (data[0] AND 0x80) and the MSB<a name="line.56"></a>
-<span class="sourceLineNo">057</span>     * is (data[data.length-1] AND 0x1).<a name="line.57"></a>
-<span class="sourceLineNo">058</span>     *<a name="line.58"></a>
-<span class="sourceLineNo">059</span>     * @param data non-null, non-zero-length byte array that is<a name="line.59"></a>
-<span class="sourceLineNo">060</span>     * converted into a bit field.<a name="line.60"></a>
-<span class="sourceLineNo">061</span>     */<a name="line.61"></a>
-<span class="sourceLineNo">062</span>    public BitField(byte[] data)<a name="line.62"></a>
-<span class="sourceLineNo">063</span>    {<a name="line.63"></a>
-<span class="sourceLineNo">064</span>        if(null == data){<a name="line.64"></a>
-<span class="sourceLineNo">065</span>            throw new IllegalArgumentException("BitField.BitField((byte[])null) is not allowed.");<a name="line.65"></a>
-<span class="sourceLineNo">066</span>        }<a name="line.66"></a>
-<span class="sourceLineNo">067</span>        if(data.length == 0){<a name="line.67"></a>
-<span class="sourceLineNo">068</span>            throw new IllegalArgumentException("BitField.BitField((byte[]){}) is not allowed.");<a name="line.68"></a>
-<span class="sourceLineNo">069</span>        }<a name="line.69"></a>
-<span class="sourceLineNo">070</span>        m_bits = new boolean [ data.length * Constants.BITS_PER_BYTE ];<a name="line.70"></a>
-<span class="sourceLineNo">071</span>        int idx = 0;<a name="line.71"></a>
-<span class="sourceLineNo">072</span>        for(int i=0; i&lt;data.length; i++){<a name="line.72"></a>
-<span class="sourceLineNo">073</span>            int bits = data[i];<a name="line.73"></a>
-<span class="sourceLineNo">074</span>            int mask = 0x80;<a name="line.74"></a>
-<span class="sourceLineNo">075</span>            for(int j=0; j&lt;Constants.BITS_PER_BYTE; j++){<a name="line.75"></a>
-<span class="sourceLineNo">076</span>                m_bits[idx++] = (bits &amp; mask) != 0;<a name="line.76"></a>
-<span class="sourceLineNo">077</span>                mask &gt;&gt;= 1;<a name="line.77"></a>
-<span class="sourceLineNo">078</span>            }<a name="line.78"></a>
-<span class="sourceLineNo">079</span>        }<a name="line.79"></a>
-<span class="sourceLineNo">080</span>    }<a name="line.80"></a>
-<span class="sourceLineNo">081</span><a name="line.81"></a>
-<span class="sourceLineNo">082</span>    /**<a name="line.82"></a>
-<span class="sourceLineNo">083</span>     * Method to compare two BitField objects.<a name="line.83"></a>
-<span class="sourceLineNo">084</span>     *<a name="line.84"></a>
-<span class="sourceLineNo">085</span>     * @param other Object to compare this object to<a name="line.85"></a>
-<span class="sourceLineNo">086</span>     *<a name="line.86"></a>
-<span class="sourceLineNo">087</span>     * @return true if the other object is a BitField object with the<a name="line.87"></a>
-<span class="sourceLineNo">088</span>     * same number of bits, and all bits have the same value.  False<a name="line.88"></a>
-<span class="sourceLineNo">089</span>     * otherwise.<a name="line.89"></a>
-<span class="sourceLineNo">090</span>     */<a name="line.90"></a>
-<span class="sourceLineNo">091</span>    public boolean equals(Object other)<a name="line.91"></a>
-<span class="sourceLineNo">092</span>    {<a name="line.92"></a>
-<span class="sourceLineNo">093</span>        // checks type consistency and not-null:<a name="line.93"></a>
-<span class="sourceLineNo">094</span>        if(!(other instanceof BitField)){<a name="line.94"></a>
-<span class="sourceLineNo">095</span>            return false;<a name="line.95"></a>
-<span class="sourceLineNo">096</span>        }<a name="line.96"></a>
-<span class="sourceLineNo">097</span>        BitField that = (BitField)other;<a name="line.97"></a>
-<span class="sourceLineNo">098</span>        return Arrays.equals(m_bits, that.m_bits);<a name="line.98"></a>
-<span class="sourceLineNo">099</span>    }<a name="line.99"></a>
-<span class="sourceLineNo">100</span><a name="line.100"></a>
-<span class="sourceLineNo">101</span>    /**<a name="line.101"></a>
-<span class="sourceLineNo">102</span>     * @param index value between (0,lenth-1)<a name="line.102"></a>
-<span class="sourceLineNo">103</span>     * @return the bit value at the specified index.<a name="line.103"></a>
-<span class="sourceLineNo">104</span>     */<a name="line.104"></a>
-<span class="sourceLineNo">105</span>    public boolean get(int index)<a name="line.105"></a>
-<span class="sourceLineNo">106</span>    {<a name="line.106"></a>
-<span class="sourceLineNo">107</span>        return m_bits[index];<a name="line.107"></a>
-<span class="sourceLineNo">108</span>    }<a name="line.108"></a>
-<span class="sourceLineNo">109</span><a name="line.109"></a>
-<span class="sourceLineNo">110</span>    /**<a name="line.110"></a>
-<span class="sourceLineNo">111</span>     * Sets the bit value at the specified index.<a name="line.111"></a>
-<span class="sourceLineNo">112</span>     * @param index value between (0,lenth-1)<a name="line.112"></a>
-<span class="sourceLineNo">113</span>     * @param value boolean value<a name="line.113"></a>
-<span class="sourceLineNo">114</span>     */<a name="line.114"></a>
-<span class="sourceLineNo">115</span>    public void set(int index, boolean value)<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    {<a name="line.116"></a>
-<span class="sourceLineNo">117</span>        m_bits[index] = value;<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    }<a name="line.118"></a>
-<span class="sourceLineNo">119</span><a name="line.119"></a>
-<span class="sourceLineNo">120</span>    /**<a name="line.120"></a>
-<span class="sourceLineNo">121</span>     * Sets the bit at the specified index to false.<a name="line.121"></a>
-<span class="sourceLineNo">122</span>     * @param index value between (0,lenth-1)<a name="line.122"></a>
+<span class="sourceLineNo">017</span>     * @param size value greater than zero indicating the number of<a name="line.17"></a>
+<span class="sourceLineNo">018</span>     * bits to represent.<a name="line.18"></a>
+<span class="sourceLineNo">019</span>     */<a name="line.19"></a>
+<span class="sourceLineNo">020</span>    public BitField(int size)<a name="line.20"></a>
+<span class="sourceLineNo">021</span>    {<a name="line.21"></a>
+<span class="sourceLineNo">022</span>        if(size &lt;= 0){<a name="line.22"></a>
+<span class="sourceLineNo">023</span>            throw new IllegalArgumentException(String.format("BitField.BitField(%d) is not allowed.", size));<a name="line.23"></a>
+<span class="sourceLineNo">024</span>        }<a name="line.24"></a>
+<span class="sourceLineNo">025</span>        m_bits = new boolean [ size ];<a name="line.25"></a>
+<span class="sourceLineNo">026</span>    }<a name="line.26"></a>
+<span class="sourceLineNo">027</span><a name="line.27"></a>
+<span class="sourceLineNo">028</span>    /**<a name="line.28"></a>
+<span class="sourceLineNo">029</span>     * Constructor to create a bit field out of a String containing<a name="line.29"></a>
+<span class="sourceLineNo">030</span>     * '1' and '0' characters.  The MSB is assumed to be on the left<a name="line.30"></a>
+<span class="sourceLineNo">031</span>     * side of the string (index zero), with the LSB on the right side<a name="line.31"></a>
+<span class="sourceLineNo">032</span>     * of the string (length - 1).<a name="line.32"></a>
+<span class="sourceLineNo">033</span>     *<a name="line.33"></a>
+<span class="sourceLineNo">034</span>     * In the parsing logic, '0' characters are 'false' and all other<a name="line.34"></a>
+<span class="sourceLineNo">035</span>     * characters are 'true'.<a name="line.35"></a>
+<span class="sourceLineNo">036</span>     *<a name="line.36"></a>
+<span class="sourceLineNo">037</span>     * @param value non-null, non-empty string to be converted to a<a name="line.37"></a>
+<span class="sourceLineNo">038</span>     * byte array.<a name="line.38"></a>
+<span class="sourceLineNo">039</span>     */<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    public BitField(String value)<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    {<a name="line.41"></a>
+<span class="sourceLineNo">042</span>        if(null == value){<a name="line.42"></a>
+<span class="sourceLineNo">043</span>            throw new IllegalArgumentException("BitField.BitField((String)null) is not allowed.");<a name="line.43"></a>
+<span class="sourceLineNo">044</span>        }<a name="line.44"></a>
+<span class="sourceLineNo">045</span>        if(value.length() == 0){<a name="line.45"></a>
+<span class="sourceLineNo">046</span>            throw new IllegalArgumentException("BitField.BitField(\"\") is not allowed.");<a name="line.46"></a>
+<span class="sourceLineNo">047</span>        }<a name="line.47"></a>
+<span class="sourceLineNo">048</span>        m_bits = new boolean [ value.length() ];<a name="line.48"></a>
+<span class="sourceLineNo">049</span>        // change the order<a name="line.49"></a>
+<span class="sourceLineNo">050</span>        for(int i=value.length()-1, idx = 0; i &gt;= 0; i--, idx++){<a name="line.50"></a>
+<span class="sourceLineNo">051</span>            m_bits[idx] = !(value.charAt(i) == '0');<a name="line.51"></a>
+<span class="sourceLineNo">052</span>        }<a name="line.52"></a>
+<span class="sourceLineNo">053</span>    }<a name="line.53"></a>
+<span class="sourceLineNo">054</span><a name="line.54"></a>
+<span class="sourceLineNo">055</span>    /**<a name="line.55"></a>
+<span class="sourceLineNo">056</span>     * Constructor to create a bit-field from a byte array.  In the<a name="line.56"></a>
+<span class="sourceLineNo">057</span>     * argument byte array, the LSB is (data[0] AND 0x80) and the MSB<a name="line.57"></a>
+<span class="sourceLineNo">058</span>     * is (data[data.length-1] AND 0x1).<a name="line.58"></a>
+<span class="sourceLineNo">059</span>     *<a name="line.59"></a>
+<span class="sourceLineNo">060</span>     * @param data non-null, non-zero-length byte array that is<a name="line.60"></a>
+<span class="sourceLineNo">061</span>     * converted into a bit field.<a name="line.61"></a>
+<span class="sourceLineNo">062</span>     */<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    public BitField(byte[] data)<a name="line.63"></a>
+<span class="sourceLineNo">064</span>    {<a name="line.64"></a>
+<span class="sourceLineNo">065</span>        if(null == data){<a name="line.65"></a>
+<span class="sourceLineNo">066</span>            throw new IllegalArgumentException("BitField.BitField((byte[])null) is not allowed.");<a name="line.66"></a>
+<span class="sourceLineNo">067</span>        }<a name="line.67"></a>
+<span class="sourceLineNo">068</span>        if(data.length == 0){<a name="line.68"></a>
+<span class="sourceLineNo">069</span>            throw new IllegalArgumentException("BitField.BitField((byte[]){}) is not allowed.");<a name="line.69"></a>
+<span class="sourceLineNo">070</span>        }<a name="line.70"></a>
+<span class="sourceLineNo">071</span>        m_bits = new boolean [ data.length * Constants.BITS_PER_BYTE ];<a name="line.71"></a>
+<span class="sourceLineNo">072</span>        int idx = 0;<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        for(int i=0; i&lt;data.length; i++){<a name="line.73"></a>
+<span class="sourceLineNo">074</span>            int bits = data[i];<a name="line.74"></a>
+<span class="sourceLineNo">075</span>            int mask = 0x80;<a name="line.75"></a>
+<span class="sourceLineNo">076</span>            for(int j=0; j&lt;Constants.BITS_PER_BYTE; j++){<a name="line.76"></a>
+<span class="sourceLineNo">077</span>                m_bits[idx++] = (bits &amp; mask) != 0;<a name="line.77"></a>
+<span class="sourceLineNo">078</span>                mask &gt;&gt;= 1;<a name="line.78"></a>
+<span class="sourceLineNo">079</span>            }<a name="line.79"></a>
+<span class="sourceLineNo">080</span>        }<a name="line.80"></a>
+<span class="sourceLineNo">081</span>    }<a name="line.81"></a>
+<span class="sourceLineNo">082</span><a name="line.82"></a>
+<span class="sourceLineNo">083</span>    /**<a name="line.83"></a>
+<span class="sourceLineNo">084</span>     * Method to compare two BitField objects.<a name="line.84"></a>
+<span class="sourceLineNo">085</span>     *<a name="line.85"></a>
+<span class="sourceLineNo">086</span>     * @param other Object to compare this object to<a name="line.86"></a>
+<span class="sourceLineNo">087</span>     *<a name="line.87"></a>
+<span class="sourceLineNo">088</span>     * @return true if the other object is a BitField object with the<a name="line.88"></a>
+<span class="sourceLineNo">089</span>     * same number of bits, and all bits have the same value.  False<a name="line.89"></a>
+<span class="sourceLineNo">090</span>     * otherwise.<a name="line.90"></a>
+<span class="sourceLineNo">091</span>     */<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    public boolean equals(Object other)<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    {<a name="line.93"></a>
+<span class="sourceLineNo">094</span>        // checks type consistency and not-null:<a name="line.94"></a>
+<span class="sourceLineNo">095</span>        if(!(other instanceof BitField)){<a name="line.95"></a>
+<span class="sourceLineNo">096</span>            return false;<a name="line.96"></a>
+<span class="sourceLineNo">097</span>        }<a name="line.97"></a>
+<span class="sourceLineNo">098</span>        BitField that = (BitField)other;<a name="line.98"></a>
+<span class="sourceLineNo">099</span>        return Arrays.equals(m_bits, that.m_bits);<a name="line.99"></a>
+<span class="sourceLineNo">100</span>    }<a name="line.100"></a>
+<span class="sourceLineNo">101</span><a name="line.101"></a>
+<span class="sourceLineNo">102</span>    /**<a name="line.102"></a>
+<span class="sourceLineNo">103</span>     * @param index value between (0,lenth-1)<a name="line.103"></a>
+<span class="sourceLineNo">104</span>     * @return the bit value at the specified index.<a name="line.104"></a>
+<span class="sourceLineNo">105</span>     */<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    public boolean get(int index)<a name="line.106"></a>
+<span class="sourceLineNo">107</span>    {<a name="line.107"></a>
+<span class="sourceLineNo">108</span>        return m_bits[index];<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    }<a name="line.109"></a>
+<span class="sourceLineNo">110</span><a name="line.110"></a>
+<span class="sourceLineNo">111</span>    /**<a name="line.111"></a>
+<span class="sourceLineNo">112</span>     * @return the number of bits in the BitField.<a name="line.112"></a>
+<span class="sourceLineNo">113</span>     */<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    public int length()<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    {<a name="line.115"></a>
+<span class="sourceLineNo">116</span>        return m_bits.length;<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    }<a name="line.117"></a>
+<span class="sourceLineNo">118</span><a name="line.118"></a>
+<span class="sourceLineNo">119</span>    /**<a name="line.119"></a>
+<span class="sourceLineNo">120</span>     * Sets the bit value at the specified index.<a name="line.120"></a>
+<span class="sourceLineNo">121</span>     * @param index value between (0,lenth-1)<a name="line.121"></a>
+<span class="sourceLineNo">122</span>     * @param value boolean value<a name="line.122"></a>
 <span class="sourceLineNo">123</span>     */<a name="line.123"></a>
-<span class="sourceLineNo">124</span>    public void setFalse(int index)<a name="line.124"></a>
+<span class="sourceLineNo">124</span>    public void set(int index, boolean value)<a name="line.124"></a>
 <span class="sourceLineNo">125</span>    {<a name="line.125"></a>
-<span class="sourceLineNo">126</span>        m_bits[index] = false;<a name="line.126"></a>
+<span class="sourceLineNo">126</span>        m_bits[index] = value;<a name="line.126"></a>
 <span class="sourceLineNo">127</span>    }<a name="line.127"></a>
 <span class="sourceLineNo">128</span><a name="line.128"></a>
 <span class="sourceLineNo">129</span>    /**<a name="line.129"></a>
-<span class="sourceLineNo">130</span>     * Sets the bit at the specified index to true.<a name="line.130"></a>
-<span class="sourceLineNo">131</span>     * @param index value between (0,lenth-1)<a name="line.131"></a>
+<span class="sourceLineNo">130</span>     * Sets all the bits to the specified value.<a name="line.130"></a>
+<span class="sourceLineNo">131</span>     * @param value the boolean value to be applied to all bits.<a name="line.131"></a>
 <span class="sourceLineNo">132</span>     */<a name="line.132"></a>
-<span class="sourceLineNo">133</span>    public void setTrue(int index)<a name="line.133"></a>
+<span class="sourceLineNo">133</span>    public void setAll(boolean value)<a name="line.133"></a>
 <span class="sourceLineNo">134</span>    {<a name="line.134"></a>
-<span class="sourceLineNo">135</span>        m_bits[index] = true;<a name="line.135"></a>
-<span class="sourceLineNo">136</span>    }<a name="line.136"></a>
-<span class="sourceLineNo">137</span><a name="line.137"></a>
-<span class="sourceLineNo">138</span>    /**<a name="line.138"></a>
-<span class="sourceLineNo">139</span>     * @return the number of bits in the BitField.<a name="line.139"></a>
-<span class="sourceLineNo">140</span>     */<a name="line.140"></a>
-<span class="sourceLineNo">141</span>    public int size()<a name="line.141"></a>
-<span class="sourceLineNo">142</span>    {<a name="line.142"></a>
-<span class="sourceLineNo">143</span>        return m_bits.length;<a name="line.143"></a>
-<span class="sourceLineNo">144</span>    }<a name="line.144"></a>
-<span class="sourceLineNo">145</span>}<a name="line.145"></a>
+<span class="sourceLineNo">135</span>        for(int i=0; i&lt;m_bits.length; i++){<a name="line.135"></a>
+<span class="sourceLineNo">136</span>            m_bits[i] = value;<a name="line.136"></a>
+<span class="sourceLineNo">137</span>        }<a name="line.137"></a>
+<span class="sourceLineNo">138</span>    }<a name="line.138"></a>
+<span class="sourceLineNo">139</span><a name="line.139"></a>
+<span class="sourceLineNo">140</span>    /** Sets all the bits to true.<a name="line.140"></a>
+<span class="sourceLineNo">141</span>     */<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    public void setAllTrue()<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    {<a name="line.143"></a>
+<span class="sourceLineNo">144</span>        setAll(true);<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    }<a name="line.145"></a>
+<span class="sourceLineNo">146</span><a name="line.146"></a>
+<span class="sourceLineNo">147</span>    /** Sets all the bits to true.<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     */<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    public void setAllFalse()<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    {<a name="line.150"></a>
+<span class="sourceLineNo">151</span>        setAll(false);<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    }<a name="line.152"></a>
+<span class="sourceLineNo">153</span><a name="line.153"></a>
+<span class="sourceLineNo">154</span>    /**<a name="line.154"></a>
+<span class="sourceLineNo">155</span>     * Sets the bit at the specified index to false.<a name="line.155"></a>
+<span class="sourceLineNo">156</span>     * @param index value between (0,length-1)<a name="line.156"></a>
+<span class="sourceLineNo">157</span>     */<a name="line.157"></a>
+<span class="sourceLineNo">158</span>    public void setFalse(int index)<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    {<a name="line.159"></a>
+<span class="sourceLineNo">160</span>        m_bits[index] = false;<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    }<a name="line.161"></a>
+<span class="sourceLineNo">162</span><a name="line.162"></a>
+<span class="sourceLineNo">163</span>    /**<a name="line.163"></a>
+<span class="sourceLineNo">164</span>     * Sets the bit at the specified index to true.<a name="line.164"></a>
+<span class="sourceLineNo">165</span>     * @param index value between (0,lenth-1)<a name="line.165"></a>
+<span class="sourceLineNo">166</span>     */<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    public void setTrue(int index)<a name="line.167"></a>
+<span class="sourceLineNo">168</span>    {<a name="line.168"></a>
+<span class="sourceLineNo">169</span>        m_bits[index] = true;<a name="line.169"></a>
+<span class="sourceLineNo">170</span>    }<a name="line.170"></a>
+<span class="sourceLineNo">171</span><a name="line.171"></a>
+<span class="sourceLineNo">172</span>    /** Returns the string representation of the bit field.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>     */<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    public String toString()<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    {<a name="line.175"></a>
+<span class="sourceLineNo">176</span>        StringBuilder sb = new StringBuilder();<a name="line.176"></a>
+<span class="sourceLineNo">177</span>        for(boolean b : m_bits){<a name="line.177"></a>
+<span class="sourceLineNo">178</span>            // put the character at the beginning<a name="line.178"></a>
+<span class="sourceLineNo">179</span>            sb.insert(0, (b ? '1' : '0'));<a name="line.179"></a>
+<span class="sourceLineNo">180</span>        }<a name="line.180"></a>
+<span class="sourceLineNo">181</span>        sb.insert(0, String.format("[%d:", m_bits.length));<a name="line.181"></a>
+<span class="sourceLineNo">182</span>        sb.append(']');<a name="line.182"></a>
+<span class="sourceLineNo">183</span>        return sb.toString();<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    }<a name="line.184"></a>
+<span class="sourceLineNo">185</span><a name="line.185"></a>
+<span class="sourceLineNo">186</span>    <a name="line.186"></a>
+<span class="sourceLineNo">187</span>}<a name="line.187"></a>
 
 
 

@@ -14,7 +14,8 @@ public class BitField
      * Constructor to create a bit-field of the specified
      * size, with all bits set to zero.
      *
-     * @param size value greater than zero indicating the number of bits to represent.
+     * @param size value greater than zero indicating the number of
+     * bits to represent.
      */
     public BitField(int size)
     {
@@ -127,6 +128,7 @@ public class BitField
 
     /**
      * Sets all the bits to the specified value.
+     * @param value the boolean value to be applied to all bits.
      */
     public void setAll(boolean value)
     {
@@ -167,13 +169,19 @@ public class BitField
 	m_bits[index] = true;
     }
 
+    /** Returns the string representation of the bit field.
+     */
     public String toString()
     {
-	StringBuilder sb = new StringBuilder(m_bits.length);
+	StringBuilder sb = new StringBuilder();
 	for(boolean b : m_bits){
 	    // put the character at the beginning
 	    sb.insert(0, (b ? '1' : '0'));
 	}
+	sb.insert(0, String.format("[%d:", m_bits.length));
+	sb.append(']');
 	return sb.toString();
     }
+
+    
 }

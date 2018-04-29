@@ -80,6 +80,17 @@ public class BitField
 	}
     }
 
+    /** Method to make a deep copy of the BitField.
+     */
+    public BitField copy()
+    {
+	BitField out = new BitField(m_bits.length);
+	for(int i=0; i<m_bits.length; i++){
+	    out.m_bits[i] = m_bits[i];
+	}
+	return out;
+    }
+
     /**
      * Method to compare two BitField objects.
      *
@@ -108,12 +119,14 @@ public class BitField
 	return m_bits[index];
     }
 
-    /**
-     * @return the number of bits in the BitField.
-     */
-    public int length()
+    public boolean getLSB()
     {
-	return m_bits.length;
+	return m_bits[0];
+    }
+
+    public boolean getMSB()
+    {
+	return m_bits[m_bits.length-1];
     }
 
     /**
@@ -169,7 +182,17 @@ public class BitField
 	m_bits[index] = true;
     }
 
-    /** Returns the string representation of the bit field.
+    /**
+     * @return the number of bits in the BitField.
+     */
+    public int size()
+    {
+	return m_bits.length;
+    }
+
+    /** @return the string representation of the bit field. This is a
+     * debug string, and cannot be passed into the constructor that
+     * takes a String argument.
      */
     public String toString()
     {
@@ -178,10 +201,30 @@ public class BitField
 	    // put the character at the beginning
 	    sb.insert(0, (b ? '1' : '0'));
 	}
-	sb.insert(0, String.format("[%d:", m_bits.length));
-	sb.append(']');
 	return sb.toString();
     }
 
-    
+    /** @return the decimal value of the bit field, as an unsigned
+     * value.
+     * @throws RuntimeException if the underlying bit field is longer
+     * than Long.SIZE (i.e., 64-bits).
+     */
+    public long toLongSigned()
+    {
+	if(m_bits.length > Long.SIZE){
+	    throw new RuntimeException(String.format("BitField.toLongSigned() called on a %d-bit field.", m_bits.length));
+	}
+	long out = 0;
+	long value = 1;
+	for(int i=0; i<(m_bits.length-1); i++){
+	    if(m_bits[i]){
+		out += value;
+	    }
+	    value += value;
+	}
+	if(m_bits[m_bits.length-1]){
+	    out -= value;
+	}
+	return out;
+    }
 }

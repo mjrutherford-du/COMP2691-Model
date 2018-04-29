@@ -5,7 +5,7 @@ BIN_DIR := bin
 
 CLASSPATH := $(BIN_DIR):$(CPSUITE):$(JUNIT_JAR):$(HAMCREST_JAR)
 
-.PHONY: compile doc clean test
+.PHONY: compile doc clean test run_grader
 
 compile:
 	mkdir -p $(BIN_DIR)
@@ -19,3 +19,6 @@ doc:
 
 clean:
 	rm -rf bin
+
+run_grader: compile
+	java -cp $(CLASSPATH) BinaryCalculatorGrader

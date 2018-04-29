@@ -9,9 +9,9 @@ public class BitFieldTest
     public void intCtor()
     {
 	m_bf = new BitField(5);
-	assertEquals(5, m_bf.length());
+	assertEquals(5, m_bf.size());
 
-	for(int i=0; i<m_bf.length(); i++){
+	for(int i=0; i<m_bf.size(); i++){
 	    assertFalse(m_bf.get(i));
 	}
     }
@@ -26,7 +26,7 @@ public class BitFieldTest
     public void stringCtor_1()
     {
 	m_bf = new BitField("1011");
-        assertEquals(4, m_bf.length());
+        assertEquals(4, m_bf.size());
 	assertTrue(m_bf.get(0));
 	assertTrue(m_bf.get(1));
 	assertFalse(m_bf.get(2));
@@ -37,7 +37,7 @@ public class BitFieldTest
     public void stringCtor_2()
     {
 	m_bf = new BitField("00000000");
-        assertEquals(8, m_bf.length());
+        assertEquals(8, m_bf.size());
 	for(int i=0; i<8; i++){
 	    assertFalse(m_bf.get(i));
 	}
@@ -47,7 +47,7 @@ public class BitFieldTest
     public void stringCtor_3()
     {
 	m_bf = new BitField("001");
-        assertEquals(3, m_bf.length());
+        assertEquals(3, m_bf.size());
         assertTrue(m_bf.get(0));
         assertFalse(m_bf.get(1));
         assertFalse(m_bf.get(2));
@@ -57,7 +57,7 @@ public class BitFieldTest
     public void stringCtor_4()
     {
 	m_bf = new BitField("1000");
-        assertEquals(4, m_bf.length());
+        assertEquals(4, m_bf.size());
         assertFalse(m_bf.get(0));
         assertFalse(m_bf.get(1));
         assertFalse(m_bf.get(2));
@@ -68,7 +68,7 @@ public class BitFieldTest
     public void stringCtor_5()
     {
 	m_bf = new BitField("111111111");
-        assertEquals(9, m_bf.length());
+        assertEquals(9, m_bf.size());
 	for(int i=0; i<9; i++){
 	    assertTrue(m_bf.get(i));
 	}
@@ -193,7 +193,7 @@ public class BitFieldTest
     public void byteArrayCtor_one_byte()
     {
 	m_bf = new BitField(new byte[] { 0x01 });
-	assertEquals(8, m_bf.length());
+	assertEquals(8, m_bf.size());
 	for(int i=0; i<7; i++){
 	    assertFalse(m_bf.get(i));
 	}
@@ -204,7 +204,7 @@ public class BitFieldTest
     public void byteArrayCtor_two_bytes()
     {
 	m_bf = new BitField(new byte[] { 0x01, (byte)0xAB });
-	assertEquals(16, m_bf.length());
+	assertEquals(16, m_bf.size());
 	for(int i=0; i<7; i++){
 	    assertFalse(m_bf.get(i));
 	}
@@ -237,8 +237,41 @@ public class BitFieldTest
     public void toString_basic()
     {
 	String in = "10100011";
-	String expected = "[" + in.length() + ":" + in + "]";
 	m_bf = new BitField(in);
-	assertEquals(expected, m_bf.toString());
+	assertEquals(in, m_bf.toString());
+    }
+
+    @Test
+    public void toLongSigned_basic()
+    {
+	m_bf = new BitField("0111");
+	assertEquals((1+2+4), m_bf.toLongSigned());
+
+	m_bf = new BitField("1111");
+	assertEquals(-1, m_bf.toLongSigned());
+    }
+
+    @Test
+    public void copy()
+    {
+	String in = "1010001100111";
+	m_bf = new BitField(in);
+	BitField c = m_bf.copy();
+	assertEquals(m_bf, c);
+	assertNotSame(m_bf, c);
+    }
+
+    @Test
+    public void getMSB_LSB()
+    {
+	String in = "10101010";
+	m_bf = new BitField(in);
+	assertTrue(m_bf.getMSB());
+	assertFalse(m_bf.getLSB());
+
+	in = "010101";
+	m_bf = new BitField(in);
+	assertFalse(m_bf.getMSB());
+	assertTrue(m_bf.getLSB());
     }
 }

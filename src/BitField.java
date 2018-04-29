@@ -80,7 +80,7 @@ public class BitField
 	}
     }
 
-    /** Method to make a deep copy of the BitField.
+    /** @return A deep copy of the BitField object.
      */
     public BitField copy()
     {

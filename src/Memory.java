@@ -1,6 +1,9 @@
 /**
  * Class to represent the Random Access Memory (RAM) of a
  * computer. Data can be read and written at any valid address.
+ *
+ * Multi-byte data are organized in big-endian order (i.e., most
+ * significant byte is at the lowest address).
  */
 public class Memory
 {

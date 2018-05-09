@@ -86,6 +86,51 @@ public class BitFieldTest
 	new BitField("");
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void intStringCtor_zeroSize()
+    {
+	new BitField(0, "101010");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void intStringCtor_null()
+    {
+	new BitField(1, (String)null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void intStringCtor_tooLong()
+    {
+	new BitField(2, "101");
+    }
+
+    @Test
+    public void intStringCtor_basic1()
+    {
+	m_bf = new BitField(2, "10");
+	assertTrue(m_bf.getMSB());
+	assertFalse(m_bf.getLSB());
+    }
+
+    @Test
+    public void intStringCtor_basic2()
+    {
+	m_bf = new BitField(2, "01");
+	assertFalse(m_bf.getMSB());
+	assertTrue(m_bf.getLSB());
+    }
+
+    @Test
+    public void intStringCtor_basic3()
+    {
+	m_bf = new BitField(5, "101");
+	assertFalse(m_bf.get(4));
+	assertFalse(m_bf.get(3));
+	assertTrue(m_bf.get(2));
+	assertFalse(m_bf.get(1));
+	assertTrue(m_bf.get(0));
+    }
+
     @Test
     public void basicSetGet()
     {
@@ -194,31 +239,62 @@ public class BitFieldTest
     {
 	m_bf = new BitField(new byte[] { 0x01 });
 	assertEquals(8, m_bf.size());
-	for(int i=0; i<7; i++){
+	for(int i=1; i<7; i++){
 	    assertFalse(m_bf.get(i));
 	}
-	assertTrue(m_bf.get(7));
+	assertTrue(m_bf.get(0));
     }
 
     @Test
     public void byteArrayCtor_two_bytes()
     {
 	m_bf = new BitField(new byte[] { 0x01, (byte)0xAB });
-	assertEquals(16, m_bf.size());
-	for(int i=0; i<7; i++){
-	    assertFalse(m_bf.get(i));
-	}
-	assertTrue(m_bf.get(7));
-	// A == 1010
-	assertTrue(m_bf.get(8));
-	assertFalse(m_bf.get(9));
-	assertTrue(m_bf.get(10));
-	assertFalse(m_bf.get(11));
-	// B == 1011
-	assertTrue(m_bf.get(12));
+	// 0 = 0000
+	assertFalse(m_bf.get(15));
+	assertFalse(m_bf.get(14));
 	assertFalse(m_bf.get(13));
-	assertTrue(m_bf.get(14));
-	assertTrue(m_bf.get(15));
+	assertFalse(m_bf.get(12));
+	// 1 = 0001
+	assertFalse(m_bf.get(11));
+	assertFalse(m_bf.get(10));
+	assertFalse(m_bf.get(9));
+	assertTrue(m_bf.get(8));
+	// A == 1010
+	assertTrue(m_bf.get(7));
+	assertFalse(m_bf.get(6));
+	assertTrue(m_bf.get(5));
+	assertFalse(m_bf.get(4));
+	// B == 1011
+	assertTrue(m_bf.get(3));
+	assertFalse(m_bf.get(2));
+	assertTrue(m_bf.get(1));
+	assertTrue(m_bf.get(0));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void byteArrayCtor_zeroSize()
+    {
+	new BitField(0, new byte[ 1 ]);
+    }
+
+    @Test
+    public void byteArrayCtor_shorter()
+    {
+	m_bf = new BitField(9, new byte[] { (byte)0x51 }); // MSB 0101 0001 LSB
+
+	// spare bit (MSB)
+	assertFalse(m_bf.get(8));
+	// 5 == 0101
+	assertFalse(m_bf.get(7));
+	assertTrue(m_bf.get(6));
+	assertFalse(m_bf.get(5));
+	assertTrue(m_bf.get(4));
+	// 1 = 0001
+	assertFalse(m_bf.get(3));
+	assertFalse(m_bf.get(2));
+	assertFalse(m_bf.get(1));
+	assertTrue(m_bf.get(0));
+	// LSB
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -249,6 +325,56 @@ public class BitFieldTest
 
 	m_bf = new BitField("1111");
 	assertEquals(-1, m_bf.toLongSigned());
+    }
+
+    @Test
+    public void toLongSigned_min()
+    {
+	m_bf = new BitField("1000000000000000000000000000000000000000000000000000000000000000");
+	assertEquals(Long.MIN_VALUE, m_bf.toLongSigned());
+    }
+
+    @Test
+    public void toLongSigned_max()
+    {
+	m_bf = new BitField("0111111111111111111111111111111111111111111111111111111111111111");
+	assertEquals(Long.MAX_VALUE, m_bf.toLongSigned());
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void toLongSigned_tooBig()
+    {
+	new BitField(65).toLongSigned();
+    }
+
+    @Test
+    public void toIntSigned_basic()
+    {
+	m_bf = new BitField("0111");
+	assertEquals((1+2+4), m_bf.toIntSigned());
+
+	m_bf = new BitField("1111");
+	assertEquals(-1, m_bf.toIntSigned());
+    }
+
+    @Test
+    public void toIntSigned_min()
+    {
+	m_bf = new BitField("10000000000000000000000000000000");
+	assertEquals(Integer.MIN_VALUE, m_bf.toIntSigned());
+    }
+
+    @Test
+    public void toIntSigned_max()
+    {
+	m_bf = new BitField("01111111111111111111111111111111");
+	assertEquals(Integer.MAX_VALUE, m_bf.toIntSigned());
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void toIntSigned_tooBig()
+    {
+	new BitField(33).toIntSigned();
     }
 
     @Test

@@ -39,43 +39,71 @@ public class BitField
      */
     public BitField(String value)
     {
+	this((null == value ? 0 : value.length()), value);
+    }
+
+    /** Constructor that allows the size to be set along with the
+     * string representation.
+     * @param size Sets the overall size of the bit field.
+     * @param value Cannot be null.  Must be less than or equal to the
+     * size of the bit field.
+     */
+    public BitField(int size, String value)
+    {
+	if(size <= 0){
+	    throw new IllegalArgumentException(String.format("BitField.BitField(%d) is not allowed.", size));
+	}
 	if(null == value){
-	    throw new IllegalArgumentException("BitField.BitField((String)null) is not allowed.");
+	    throw new IllegalArgumentException("BitField.BitField(int,(String)null) is not allowed.");
 	}
-	if(value.length() == 0){
-	    throw new IllegalArgumentException("BitField.BitField(\"\") is not allowed.");
+	if(value.length() > size){
+	    throw new IllegalArgumentException(String.format("BitField.BitField(%d,\"%s\") not allowed.", size, value));
 	}
-	m_bits = new boolean [ value.length() ];
+	m_bits = new boolean [ size ];
 	// change the order
 	for(int i=value.length()-1, idx = 0; i >= 0; i--, idx++){
 	    m_bits[idx] = !(value.charAt(i) == '0');
 	}
+
     }
 
     /**
      * Constructor to create a bit-field from a byte array.  In the
-     * argument byte array, the LSB is (data[0] AND 0x80) and the MSB
-     * is (data[data.length-1] AND 0x1).
+     * argument byte array, the bytes are organized in big-endian
+     * order (i.e., the most significant byte is at the lowest index).
+     *
+     * <pre>{ 0xA1, 0xB2 } leads to MSB 1010 0001 1011 0010 MSB</pre>
      *
      * @param data non-null, non-zero-length byte array that is
      * converted into a bit field.
      */
     public BitField(byte[] data)
     {
+	this((null == data ? 0 : data.length*Constants.BITS_PER_BYTE), data);
+    }
+    
+    public BitField(int size, byte[] data)
+    {
+	if(0 == size){
+	    throw new IllegalArgumentException("BitField.BitField(0, (byte[])) is not allowed.");
+	}
 	if(null == data){
-	    throw new IllegalArgumentException("BitField.BitField((byte[])null) is not allowed.");
+	    throw new IllegalArgumentException("BitField.BitField(int,(byte[])null) is not allowed.");
 	}
 	if(data.length == 0){
-	    throw new IllegalArgumentException("BitField.BitField((byte[]){}) is not allowed.");
+	    throw new IllegalArgumentException("BitField.BitField(int,(byte[]){}) is not allowed.");
 	}
-	m_bits = new boolean [ data.length * Constants.BITS_PER_BYTE ];
+	if(data.length*Constants.BITS_PER_BYTE > size){
+	    throw new IllegalArgumentException(String.format("BitField.BitField(int,(byte[]) data length (%d) is too big for specified bits (%d)", (data.length*Constants.BITS_PER_BYTE), size));
+	}
+	m_bits = new boolean [ size ];
 	int idx = 0;
-	for(int i=0; i<data.length; i++){
+	for(int i=(data.length-1); i>=0; i--){
 	    int bits = data[i];
-	    int mask = 0x80;
+	    int mask = 0x1;
 	    for(int j=0; j<Constants.BITS_PER_BYTE; j++){
 		m_bits[idx++] = (bits & mask) != 0;
-		mask >>= 1;
+		mask <<= 1;
 	    }
 	}
     }
@@ -216,6 +244,30 @@ public class BitField
 	}
 	long out = 0;
 	long value = 1;
+	for(int i=0; i<(m_bits.length-1); i++){
+	    if(m_bits[i]){
+		out += value;
+	    }
+	    value += value;
+	}
+	if(m_bits[m_bits.length-1]){
+	    out -= value;
+	}
+	return out;
+    }
+
+    /** @return the decimal value of the bit field, as an unsigned
+     * value.
+     * @throws RuntimeException if the underlying bit field is longer
+     * than Integer.SIZE (i.e., 32-bits).
+     */
+    public int toIntSigned()
+    {
+	if(m_bits.length > Integer.SIZE){
+	    throw new RuntimeException(String.format("BitField.toIntSigned() called on a %d-bit field.", m_bits.length));
+	}
+	int out = 0;
+	int value = 1;
 	for(int i=0; i<(m_bits.length-1); i++){
 	    if(m_bits[i]){
 		out += value;

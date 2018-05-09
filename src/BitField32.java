@@ -9,4 +9,9 @@ public class BitField32 extends BitField
     {
 	super(32, value);
     }
+
+    public BitField32(byte[] data)
+    {
+	super(32, data);
+    }
 }

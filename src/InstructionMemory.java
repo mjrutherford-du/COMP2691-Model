@@ -1,5 +1,5 @@
 /** Class representing the interface between the processor
- * and physical memory.
+ * and physical memory for instruction transactions.
  */
 public class InstructionMemory
 {

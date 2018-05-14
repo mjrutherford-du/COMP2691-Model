@@ -77,7 +77,7 @@ public class BinaryCalculatorGrader
 		else {
 		    if(!res[0].equals(exp[0]) || !res[1].equals(exp[1])){
 			System.out.println(String.format("FAIL: <%s> / <%s> expected <%s remainder %s> but was <%s remainder %s>",
-							 arg1, arg2, exp[0], exp[1], res[1], res[1]));
+							 arg1, arg2, exp[0], exp[1], res[0], res[1]));
 		    }
 		    else {
 			n_correct++;

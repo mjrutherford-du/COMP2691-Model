@@ -185,7 +185,7 @@ public class BitField
 	setAll(true);
     }
 
-    /** Sets all the bits to true.
+    /** Sets all the bits to false.
      */
     public void setAllFalse()
     {
